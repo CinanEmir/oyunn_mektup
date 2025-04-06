@@ -28,7 +28,7 @@
 
     .envelope-container {
       width: 100%;
-      max-width: 500px;
+      max-width: 400px;
       position: relative;
       cursor: pointer;
     }
@@ -60,9 +60,9 @@
     .paper {
       position: absolute;
       top: 15%;
-      left: 6%;
-      width: 80%;
-      padding: 20px;
+      left: 2.5%;
+      width: 88%;
+      padding: 15px;
       background: white;
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -70,6 +70,8 @@
       transition: opacity 0.5s ease 0.3s;
       z-index: 1;
       text-align: center;
+      font-size: 16px;
+      pointer-events: none;
     }
 
     .open .flap {
@@ -78,25 +80,27 @@
 
     .open .paper {
       opacity: 1;
+      pointer-events: auto;
     }
 
     .buttons {
-      margin-top: 20px;
+      margin-top: 15px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 6px 12px;
       border: none;
       border-radius: 10px;
       background: pink;
       font-family: 'Pacifico', cursive;
-      font-size: 16px;
+      font-size: 14px;
       cursor: pointer;
       transition: background 0.3s;
+      touch-action: manipulation;
     }
 
     .btn:hover {
@@ -105,7 +109,7 @@
 
     #bekliyorum {
       margin-top: 20px;
-      font-size: 24px;
+      font-size: 20px;
       display: none;
     }
 
@@ -113,7 +117,7 @@
       display: none;
       margin-top: 20px;
       width: 100%;
-      max-width: 300px;
+      max-width: 250px;
     }
 
     .gif-container img {
@@ -141,8 +145,6 @@
   </div>
 </div>
 
-<div id="bekliyorum">Bekliyorummmmm</div>
-
 <div class="gif-container" id="happyGif">
   <img src="https://media1.giphy.com/media/uzSqOMufuduTu/giphy.gif" alt="Mutlu GIF">
 </div>
@@ -150,6 +152,8 @@
 <div class="gif-container" id="sadGif">
   <img src="https://media4.giphy.com/media/RDnBOLf1rwsIo/giphy.gif" alt="Üzgün GIF">
 </div>
+
+<div id="bekliyorum">Bekliyorummmmm</div>
 
 <script>
   let noClickCount = 0;
@@ -165,77 +169,26 @@
   const happyGif = document.getElementById('happyGif');
   const sadGif = document.getElementById('sadGif');
 
-  function toggleEnvelope(e) {
-    e.preventDefault();
+  function toggleEnvelope() {
     isEnvelopeOpen = !isEnvelopeOpen;
     envelope.classList.toggle('open', isEnvelopeOpen);
   }
 
-  // Hem tıklama hem dokunma olaylarını dinle
-  ['click', 'touchend'].forEach(eventType => {
-    envelopeContainer.addEventListener(eventType, toggleEnvelope, false);
+  envelopeContainer.addEventListener('click', toggleEnvelope);
+
+  yesBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    bekliyorum.style.display = 'block';
+    happyGif.style.display = 'block';
+    sadGif.style.display = 'none';
   });
 
-  if (yesBtn) {
-    yesBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      bekliyorum.style.display = 'block';
-      happyGif.style.display = 'block';
-      sadGif.style.display = 'none';
-    }, false);
-  }
+  noBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
 
-  if (noBtn) {
-    noBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (noBtn.textContent === "Hayır") {
-        noBtn.textContent = "Evet";
-        noBtn.onclick = function(ev) {
-          ev.preventDefault();
-          ev.stopPropagation();
-          bekliyorum.style.display = 'block';
-          happyGif.style.display = 'block';
-          sadGif.style.display = 'none';
-        };
-
-        noClickCount++;
-        if (noClickCount < maxNoButtons) {
-          const newNo = document.createElement('button');
-          newNo.className = 'btn';
-          newNo.textContent = 'Hayır';
-          newNo.type = 'button';
-          newNo.onclick = function(ev) {
-            ev.preventDefault();
-            ev.stopPropagation();
-            handleNoButton(newNo);
-          };
-          buttonsDiv.appendChild(newNo);
-        } else {
-          if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate([200, 100, 200]);
-          }
-          noBtn.textContent = "EVETTT🤕";
-          bekliyorum.style.display = 'none';
-          happyGif.style.display = 'none';
-          sadGif.style.display = 'block';
-        }
-      }
-    }, false);
-  }
-
-  function handleNoButton(button) {
-    if (button.textContent === "Hayır") {
-      button.textContent = "Evet";
-      button.onclick = function(ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        bekliyorum.style.display = 'block';
-        happyGif.style.display = 'block';
-        sadGif.style.display = 'none';
-      };
+    if (noBtn.textContent === "Hayır") {
+      noBtn.textContent = "Evet";
+      noBtn.onclick = evetTiklandi;
 
       noClickCount++;
       if (noClickCount < maxNoButtons) {
@@ -244,13 +197,40 @@
         newNo.textContent = 'Hayır';
         newNo.type = 'button';
         newNo.onclick = function(ev) {
-          ev.preventDefault();
           ev.stopPropagation();
           handleNoButton(newNo);
         };
         buttonsDiv.appendChild(newNo);
       } else {
-        if (window.navigator && window.navigator.vibrate) {
+        if (window.navigator.vibrate) {
+          window.navigator.vibrate([200, 100, 200]);
+        }
+        noBtn.textContent = "EVETTT🤕";
+        bekliyorum.style.display = 'none';
+        happyGif.style.display = 'none';
+        sadGif.style.display = 'block';
+      }
+    }
+  });
+
+  function handleNoButton(button) {
+    if (button.textContent === "Hayır") {
+      button.textContent = "Evet";
+      button.onclick = evetTiklandi;
+
+      noClickCount++;
+      if (noClickCount < maxNoButtons) {
+        const newNo = document.createElement('button');
+        newNo.className = 'btn';
+        newNo.textContent = 'Hayır';
+        newNo.type = 'button';
+        newNo.onclick = function(ev) {
+          ev.stopPropagation();
+          handleNoButton(newNo);
+        };
+        buttonsDiv.appendChild(newNo);
+      } else {
+        if (window.navigator.vibrate) {
           window.navigator.vibrate([200, 100, 200]);
         }
         button.textContent = "EVETTT🤕";
@@ -261,8 +241,13 @@
     }
   }
 
-  // iOS için dokunma desteği
-  document.addEventListener('touchstart', function() {}, {passive: true});
+  function evetTiklandi(e) {
+    e?.stopPropagation();
+    bekliyorum.style.display = 'block';
+    happyGif.style.display = 'block';
+    sadGif.style.display = 'none';
+  }
+
 </script>
 
 </body>
