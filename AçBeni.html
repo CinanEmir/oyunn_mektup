@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OyunnnnMektubu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background-color: pink;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Pacifico', cursive;
+      padding: 20px;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .click-text {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .envelope-container {
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .envelope {
+      width: 100%;
+      height: 0;
+      padding-bottom: 66%;
+      background: #a0a0a0;
+      position: relative;
+      border-radius: 5px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: #b0b0b0;
+      border-radius: 5px 5px 0 0;
+      transform-origin: top;
+      transition: transform 0.8s ease;
+      z-index: 2;
+      clip-path: polygon(0 0, 100% 0, 50% 50%);
+    }
+
+    .paper {
+      position: absolute;
+      top: 15%;
+      left: 6%;
+      width: 80%;
+      padding: 20px;
+      background: white;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      opacity: 0;
+      transition: opacity 0.5s ease 0.3s;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .open .flap {
+      transform: rotateX(180deg);
+    }
+
+    .open .paper {
+      opacity: 1;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 10px;
+      background: pink;
+      font-family: 'Pacifico', cursive;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #ffb6c1;
+    }
+
+    #bekliyorum {
+      margin-top: 20px;
+      font-size: 24px;
+      display: none;
+    }
+
+    .gif-container {
+      display: none;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .gif-container img {
+      width: 100%;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="click-text">Tıkla</div>
+
+<div class="envelope-container" id="envelopeContainer" role="button" tabindex="0">
+  <div class="envelope" id="envelope">
+    <div class="flap"></div>
+    <div class="paper">
+      <span>✉️🎮😊</span><br>
+      Oyuna geliyor musun?<br>
+      <span>😌</span>
+      <div class="buttons" id="buttons">
+        <button class="btn" id="yesBtn" type="button">Evet</button>
+        <button class="btn" id="noBtn" type="button">Hayır</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="bekliyorum">Bekliyorummmmm</div>
+
+<div class="gif-container" id="happyGif">
+  <img src="https://media1.giphy.com/media/uzSqOMufuduTu/giphy.gif" alt="Mutlu GIF">
+</div>
+
+<div class="gif-container" id="sadGif">
+  <img src="https://media4.giphy.com/media/RDnBOLf1rwsIo/giphy.gif" alt="Üzgün GIF">
+</div>
+
+<script>
+  let noClickCount = 0;
+  const maxNoButtons = 10;
+  let isEnvelopeOpen = false;
+
+  const envelope = document.getElementById('envelope');
+  const envelopeContainer = document.getElementById('envelopeContainer');
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn = document.getElementById('noBtn');
+  const buttonsDiv = document.getElementById('buttons');
+  const bekliyorum = document.getElementById('bekliyorum');
+  const happyGif = document.getElementById('happyGif');
+  const sadGif = document.getElementById('sadGif');
+
+  function toggleEnvelope(e) {
+    e.preventDefault();
+    isEnvelopeOpen = !isEnvelopeOpen;
+    envelope.classList.toggle('open', isEnvelopeOpen);
+  }
+
+  // Hem tıklama hem dokunma olaylarını dinle
+  ['click', 'touchend'].forEach(eventType => {
+    envelopeContainer.addEventListener(eventType, toggleEnvelope, false);
+  });
+
+  if (yesBtn) {
+    yesBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      bekliyorum.style.display = 'block';
+      happyGif.style.display = 'block';
+      sadGif.style.display = 'none';
+    }, false);
+  }
+
+  if (noBtn) {
+    noBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (noBtn.textContent === "Hayır") {
+        noBtn.textContent = "Evet";
+        noBtn.onclick = function(ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          bekliyorum.style.display = 'block';
+          happyGif.style.display = 'block';
+          sadGif.style.display = 'none';
+        };
+
+        noClickCount++;
+        if (noClickCount < maxNoButtons) {
+          const newNo = document.createElement('button');
+          newNo.className = 'btn';
+          newNo.textContent = 'Hayır';
+          newNo.type = 'button';
+          newNo.onclick = function(ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            handleNoButton(newNo);
+          };
+          buttonsDiv.appendChild(newNo);
+        } else {
+          if (window.navigator && window.navigator.vibrate) {
+            window.navigator.vibrate([200, 100, 200]);
+          }
+          noBtn.textContent = "EVETTT🤕";
+          bekliyorum.style.display = 'none';
+          happyGif.style.display = 'none';
+          sadGif.style.display = 'block';
+        }
+      }
+    }, false);
+  }
+
+  function handleNoButton(button) {
+    if (button.textContent === "Hayır") {
+      button.textContent = "Evet";
+      button.onclick = function(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        bekliyorum.style.display = 'block';
+        happyGif.style.display = 'block';
+        sadGif.style.display = 'none';
+      };
+
+      noClickCount++;
+      if (noClickCount < maxNoButtons) {
+        const newNo = document.createElement('button');
+        newNo.className = 'btn';
+        newNo.textContent = 'Hayır';
+        newNo.type = 'button';
+        newNo.onclick = function(ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          handleNoButton(newNo);
+        };
+        buttonsDiv.appendChild(newNo);
+      } else {
+        if (window.navigator && window.navigator.vibrate) {
+          window.navigator.vibrate([200, 100, 200]);
+        }
+        button.textContent = "EVETTT🤕";
+        bekliyorum.style.display = 'none';
+        happyGif.style.display = 'none';
+        sadGif.style.display = 'block';
+      }
+    }
+  }
+
+  // iOS için dokunma desteği
+  document.addEventListener('touchstart', function() {}, {passive: true});
+</script>
+
+</body>
+</html>
