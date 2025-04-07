@@ -119,6 +119,12 @@
       width: 100%;
       max-width: 250px;
     }
+    .sad_gif-container {
+      display: none;
+      margin-top: 50px;
+      width: 100%;
+      max-width: 250px;
+    }
 
     .gif-container img {
       width: 100%;
@@ -149,7 +155,7 @@
   <img src="https://media1.giphy.com/media/uzSqOMufuduTu/giphy.gif" alt="Mutlu GIF">
 </div>
 
-<div class="gif-container" id="sadGif">
+<div class="sad_gif-container" id="sadGif">
   <img src="https://media4.giphy.com/media/RDnBOLf1rwsIo/giphy.gif" alt="Üzgün GIF">
 </div>
 
@@ -157,8 +163,9 @@
 
 <script>
   let noClickCount = 0;
-  const maxNoButtons = 6;
+  const maxNoButtons = 5;
   let isEnvelopeOpen = false;
+  let lastShown = null; // 'happy' ya da 'sad'
 
   const envelope = document.getElementById('envelope');
   const envelopeContainer = document.getElementById('envelopeContainer');
@@ -172,7 +179,26 @@
   function toggleEnvelope() {
     isEnvelopeOpen = !isEnvelopeOpen;
     envelope.classList.toggle('open', isEnvelopeOpen);
+  
+    if (!isEnvelopeOpen) {
+      // Zarf kapandı → Her şeyi gizle
+      bekliyorum.style.display = 'none';
+      happyGif.style.display = 'none';
+      sadGif.style.display = 'none';
+    } else {
+      // Zarf açıldıysa ve daha önce bir şey gösterildiyse, onu geri getir
+      if (lastShown === 'happy') {
+        bekliyorum.style.display = 'block';
+        happyGif.style.display = 'block';
+        sadGif.style.display = 'none';
+      } else if (lastShown === 'sad') {
+        bekliyorum.style.display = 'none';
+        happyGif.style.display = 'none';
+        sadGif.style.display = 'block';
+      }
+    }
   }
+  
 
   envelopeContainer.addEventListener('click', toggleEnvelope);
 
@@ -181,6 +207,7 @@
     bekliyorum.style.display = 'block';
     happyGif.style.display = 'block';
     sadGif.style.display = 'none';
+    lastShown = 'happy';
   });
 
   noBtn.addEventListener('click', function(e) {
@@ -209,6 +236,7 @@
         bekliyorum.style.display = 'none';
         happyGif.style.display = 'none';
         sadGif.style.display = 'block';
+        lastShown = 'sad';
       }
     }
   });
@@ -237,6 +265,7 @@
         bekliyorum.style.display = 'none';
         happyGif.style.display = 'none';
         sadGif.style.display = 'block';
+        lastShown = 'happy';
       }
     }
   }
