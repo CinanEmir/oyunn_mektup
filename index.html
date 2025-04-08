@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>OyunnnnMektubu</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
@@ -16,8 +16,7 @@
       min-height: 100vh;
       font-family: 'Pacifico', cursive;
       padding: 20px;
-      -webkit-touch-callout: none;
-      -webkit-tap-highlight-color: transparent;
+      position: relative;
     }
 
     .click-text {
@@ -110,29 +109,40 @@
     #bekliyorum {
       margin-top: 20px;
       font-size: 20px;
-      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .gif-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 250px;
+      height: 200px;
+      margin-top: 20px;
     }
 
     .gif-container {
-      display: none;
-      margin-top: 80px;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
       width: 100%;
-      max-width: 250px;
-    }
-    .sad_gif-container {
-      display: none;
-      margin-top: 50px;
-      width: 100%;
-      max-width: 250px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
     }
 
     .gif-container img {
       width: 100%;
       border-radius: 10px;
     }
+
+    .visible {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
+<audio id="openSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4dfe7e1ab3.mp3?filename=paper-flip-1-102895.mp3" preload="auto"></audio>
 
 <div class="click-text">Tıkla</div>
 
@@ -151,21 +161,21 @@
   </div>
 </div>
 
-<div class="gif-container" id="happyGif">
-  <img src="https://media1.giphy.com/media/uzSqOMufuduTu/giphy.gif" alt="Mutlu GIF">
-</div>
-
-<div class="sad_gif-container" id="sadGif">
-  <img src="https://media4.giphy.com/media/RDnBOLf1rwsIo/giphy.gif" alt="Üzgün GIF">
-</div>
-
 <div id="bekliyorum">Bekliyorummmmm</div>
+
+<div class="gif-wrapper">
+  <div class="gif-container" id="happyGif">
+    <img src="https://media1.giphy.com/media/uzSqOMufuduTu/giphy.gif" alt="Mutlu GIF">
+  </div>
+  <div class="gif-container" id="sadGif">
+    <img src="https://media4.giphy.com/media/RDnBOLf1rwsIo/giphy.gif" alt="Üzgün GIF">
+  </div>
+</div>
 
 <script>
   let noClickCount = 0;
-  const maxNoButtons = 5;
+  const maxNoButtons = 6;
   let isEnvelopeOpen = false;
-  let lastShown = null; // 'happy' ya da 'sad'
 
   const envelope = document.getElementById('envelope');
   const envelopeContainer = document.getElementById('envelopeContainer');
@@ -177,37 +187,35 @@
   const sadGif = document.getElementById('sadGif');
 
   function toggleEnvelope() {
+    const openSound = document.getElementById('openSound');
     isEnvelopeOpen = !isEnvelopeOpen;
     envelope.classList.toggle('open', isEnvelopeOpen);
   
-    if (!isEnvelopeOpen) {
-      // Zarf kapandı → Her şeyi gizle
-      bekliyorum.style.display = 'none';
-      happyGif.style.display = 'none';
-      sadGif.style.display = 'none';
-    } else {
-      // Zarf açıldıysa ve daha önce bir şey gösterildiyse, onu geri getir
-      if (lastShown === 'happy') {
-        bekliyorum.style.display = 'block';
-        happyGif.style.display = 'block';
-        sadGif.style.display = 'none';
-      } else if (lastShown === 'sad') {
-        bekliyorum.style.display = 'none';
-        happyGif.style.display = 'none';
-        sadGif.style.display = 'block';
+    if (isEnvelopeOpen) {
+      try {
+        openSound.currentTime = 0;
+        openSound.play().catch(e => {
+          console.warn("Ses çalınamadı:", e);
+        });
+      } catch (e) {
+        console.warn("Ses oynatma hatası:", e);
       }
+    } else {
+      bekliyorum.style.opacity = '0';
+      happyGif.classList.remove('visible');
+      sadGif.classList.remove('visible');
     }
   }
+  
   
 
   envelopeContainer.addEventListener('click', toggleEnvelope);
 
   yesBtn.addEventListener('click', function(e) {
     e.stopPropagation();
-    bekliyorum.style.display = 'block';
-    happyGif.style.display = 'block';
-    sadGif.style.display = 'none';
-    lastShown = 'happy';
+    bekliyorum.style.opacity = '1';
+    happyGif.classList.add('visible');
+    sadGif.classList.remove('visible');
   });
 
   noBtn.addEventListener('click', function(e) {
@@ -233,10 +241,9 @@
           window.navigator.vibrate([200, 100, 200]);
         }
         noBtn.textContent = "EVETTT🤕";
-        bekliyorum.style.display = 'none';
-        happyGif.style.display = 'none';
-        sadGif.style.display = 'block';
-        lastShown = 'sad';
+        bekliyorum.style.opacity = '0';
+        happyGif.classList.remove('visible');
+        sadGif.classList.add('visible');
       }
     }
   });
@@ -262,21 +269,19 @@
           window.navigator.vibrate([200, 100, 200]);
         }
         button.textContent = "EVETTT🤕";
-        bekliyorum.style.display = 'none';
-        happyGif.style.display = 'none';
-        sadGif.style.display = 'block';
-        lastShown = 'happy';
+        bekliyorum.style.opacity = '0';
+        happyGif.classList.remove('visible');
+        sadGif.classList.add('visible');
       }
     }
   }
 
   function evetTiklandi(e) {
     e?.stopPropagation();
-    bekliyorum.style.display = 'block';
-    happyGif.style.display = 'block';
-    sadGif.style.display = 'none';
+    bekliyorum.style.opacity = '1';
+    happyGif.classList.add('visible');
+    sadGif.classList.remove('visible');
   }
-
 </script>
 
 </body>
